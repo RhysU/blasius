@@ -45,38 +45,37 @@ jac (double eta, const double f[], double* d2f, double df[], void *params)
 int
 main (int argc, const char *argv[])
 {
-
-    // Prepare result output frequency, initial eta, and final eta.
-    // Final eta read from argv[1] if supplied, otherwise Ganapol's used.
-    const double deleta = 0.2;
-    double       eta    = 0.0;
-    const double etaf   = (argc > 1) ? atof(argv[1]) : 8.8;
+    // Process optional parameters from command line
+    const double etaf   = (argc > 1) ? atof(argv[1]) : 10.0;
+    const double deleta = (argc > 2) ? atof(argv[2]) :  0.2;
+    const double tol    = (argc > 3) ? atof(argv[3]) : GSL_DBL_EPSILON;
 
     // Define the problem, tolerance, and initial step size
-    // Do not trust in the tolerance as Blasius is notoriously difficult
-    // Tolerance read from argv[2] if supplied, otherwise epsilon used.
-    const double tol = (argc > 2) ? atof(argv[2]) : GSL_DBL_EPSILON;
+    // Do /not/ blindly trust the tolerance as Blasius is notoriously difficult
     const gsl_odeiv2_system sys = {func, jac, ndim, NULL};
     gsl_odeiv2_driver* const d = gsl_odeiv2_driver_alloc_yp_new (
-            &sys, gsl_odeiv2_step_rk4imp, sqrt(tol), tol, 0.0);
+            &sys, gsl_odeiv2_step_rk4imp, tol/2, tol, 0.0);
 
     // Initial condition from equation 11 of http://arxiv.org/abs/1006.3888
+    double eta = 0.0;
     double f[ndim] = { 0.0, 0.0, 0.33205733621519630 };
-
-    int status;
     printf("%22s  %22s  %22s  %22s\n", "eta", "f", "fp", "fpp");
     printf("%22.16e  %22.16e  %22.16e  %22.16e\n", eta, f[0], f[1], f[2]);
+
+    // Integrate until either final time achieved or error encountered
+    // TODO Final time is sloppy due to round off accumulation
+    int err = 0;
     while (eta < etaf)
     {
-        status = gsl_odeiv2_driver_apply (d, &eta, eta + deleta, f);
-        if (GSL_SUCCESS != status) {
+        err = gsl_odeiv2_driver_apply (d, &eta, eta + deleta, f);
+        if (err) {
             fprintf(stderr, "At %g encountered error %d: %s\n",
-                    eta, status, gsl_strerror(status));
+                    eta, err, gsl_strerror(err));
             break;
         }
         printf("%22.16e  %22.16e  %22.16e  %22.16e\n", eta, f[0], f[1], f[2]);
     }
 
     gsl_odeiv2_driver_free (d);
-    return 0;
+    return err;
 }
