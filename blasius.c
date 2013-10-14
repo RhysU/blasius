@@ -3,6 +3,7 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_machine.h>
 #include <gsl/gsl_odeiv2.h>
@@ -42,19 +43,22 @@ jac (double eta, const double f[], double* d2f, double df[], void *params)
 
 // Use GSL ODEIV2 to implicitly advance the solution outputting regularly
 int
-main (void)
+main (int argc, const char *argv[])
 {
+
+    // Prepare result output frequency, initial eta, and final eta.
+    // Final eta read from argv[1] if supplied, otherwise Ganapol's used.
+    const double deleta = 0.2;
+    double       eta    = 0.0;
+    const double etaf   = (argc > 1) ? atof(argv[1]) : 8.8;
+
     // Define the problem, tolerance, and initial step size
     // Do not trust in the tolerance as Blasius is notoriously difficult
-    const double tol = GSL_DBL_EPSILON;
+    // Tolerance read from argv[2] if supplied, otherwise epsilon used.
+    const double tol = (argc > 2) ? atof(argv[2]) : GSL_DBL_EPSILON;
     const gsl_odeiv2_system sys = {func, jac, ndim, NULL};
     gsl_odeiv2_driver* const d = gsl_odeiv2_driver_alloc_yp_new (
             &sys, gsl_odeiv2_step_rk4imp, sqrt(tol), tol, 0.0);
-
-    // Prepare output frequency, initial eta, and final eta
-    const double deleta = 0.2;
-    double       eta    = 0.0;
-    double       etaf   = 8.8;
 
     // Initial condition from equation 11 of http://arxiv.org/abs/1006.3888
     double f[ndim] = { 0.0, 0.0, 0.33205733621519630 };
