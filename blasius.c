@@ -61,11 +61,10 @@ main (int argc, const char *argv[])
     // Having a high-precision initial condition avoids shooting approaches
     double eta = 0.0;
     double f[ndim] = { 0.0, 0.0, 0.33205733621519630 };
-    printf("%22s  %22s  %22s  %22s\n", "eta", "f", "fp", "fpp");
-    printf("%22.16e  %22.16e  %22.16e  %22.16e\n", eta, f[0], f[1], f[2]);
 
     // Integrate until either final time achieved or error encountered
     int err = 0;
+    printf("%22s  %22s  %22s  %22s\n", "eta", "f", "fp", "fpp");
     for (int niter = 0; eta < etaf; ++niter) { // Odd, but avoids drift
         err = gsl_odeiv2_driver_apply (d, &eta, GSL_MIN(etaf, niter*deleta), f);
         if (err) {
