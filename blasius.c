@@ -13,6 +13,7 @@
 enum { ndim = 3 };
 
 // Evaluate the Blasius RHS
+// http://www.gnu.org/software/gsl/manual/html_node/Defining-the-ODE-System.html
 static inline int
 func (double eta, const double f[], double df[], void *params)
 {
@@ -24,36 +25,18 @@ func (double eta, const double f[], double df[], void *params)
     return GSL_SUCCESS;
 }
 
-// Evaluate the Blasius Jacobian and delegate for the RHS
-// http://www.gnu.org/software/gsl/manual/html_node/Defining-the-ODE-System.html
-static int
-jac (double eta, const double f[], double* d2f, double df[], void *params)
-{
-    d2f[/*0*/  + 0] = 0;
-    d2f[/*0*/  + 1] = 1;
-    d2f[/*0*/  + 2] = 0;
-    d2f[  ndim + 0] = 0;
-    d2f[  ndim + 1] = 0;
-    d2f[  ndim + 2] = 1;
-    d2f[2*ndim + 0] = -f[0] / 2;
-    d2f[2*ndim + 1] = 0;
-    d2f[2*ndim + 2] = -f[2] / 2;
-
-    return func(eta, f, df, params);
-}
-
 // Use GSL ODEIV2 to implicitly advance the solution outputting regularly
 int
 main (int argc, const char *argv[])
 {
     // Process optional parameters from command line
-    const double etaf   = (argc > 1) ? atof(argv[1]) : 10.0;
+    const double etaf   = (argc > 1) ? atof(argv[1]) : 13.6;
     const double deleta = (argc > 2) ? atof(argv[2]) :  0.2;
     const double tol    = (argc > 3) ? atof(argv[3]) : GSL_DBL_EPSILON;
 
     // Define the problem, tolerance, and initial step size
     // Do /not/ blindly trust the tolerance as Blasius is notoriously difficult
-    const gsl_odeiv2_system sys = {func, jac, ndim, NULL};
+    const gsl_odeiv2_system sys = {func, NULL, ndim, NULL};
     gsl_odeiv2_driver* const d = gsl_odeiv2_driver_alloc_yp_new (
             &sys, gsl_odeiv2_step_rk8pd, tol*10, tol, 0.0);
 
