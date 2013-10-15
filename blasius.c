@@ -63,11 +63,9 @@ main (int argc, const char *argv[])
     printf("%22.16e  %22.16e  %22.16e  %22.16e\n", eta, f[0], f[1], f[2]);
 
     // Integrate until either final time achieved or error encountered
-    // TODO Final time is sloppy due to round off accumulation
     int err = 0;
-    while (eta < etaf)
-    {
-        err = gsl_odeiv2_driver_apply (d, &eta, eta + deleta, f);
+    for (int niter = 0; eta < etaf; ++niter) { // Odd, but avoids drift
+        err = gsl_odeiv2_driver_apply (d, &eta, niter*deleta, f);
         if (err) {
             fprintf(stderr, "At %g encountered error %d: %s\n",
                     eta, err, gsl_strerror(err));
