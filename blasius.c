@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_machine.h>
+#include <gsl/gsl_minmax.h>
 #include <gsl/gsl_odeiv2.h>
 
 // Blasius equation is f''' = - f * f'' / 2 producing a 3D first-order system
@@ -65,7 +66,7 @@ main (int argc, const char *argv[])
     // Integrate until either final time achieved or error encountered
     int err = 0;
     for (int niter = 0; eta < etaf; ++niter) { // Odd, but avoids drift
-        err = gsl_odeiv2_driver_apply (d, &eta, niter*deleta, f);
+        err = gsl_odeiv2_driver_apply (d, &eta, GSL_MIN(etaf, niter*deleta), f);
         if (err) {
             fprintf(stderr, "At %g encountered error %d: %s\n",
                     eta, err, gsl_strerror(err));
