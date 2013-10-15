@@ -12,10 +12,9 @@
 // Blasius equation is f''' = - f * f'' / 2 producing a 3D first-order system
 enum { ndim = 3 };
 
-// Evaluate the Blasius RHS
-// http://www.gnu.org/software/gsl/manual/html_node/Defining-the-ODE-System.html
+// Evaluate the Blasius function RHS
 static inline int
-func (double eta, const double f[], double df[], void *params)
+func (double eta, const double f[ndim], double df[ndim], void *params)
 {
     (void) eta;
     (void) params;
@@ -25,7 +24,7 @@ func (double eta, const double f[], double df[], void *params)
     return GSL_SUCCESS;
 }
 
-// Use GSL ODEIV2 to implicitly advance the solution outputting regularly
+// Use GSL ODEIV2 to advance the solution outputting at regular intervals
 int
 main (int argc, const char *argv[])
 {
