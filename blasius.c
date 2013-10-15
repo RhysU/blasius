@@ -58,6 +58,7 @@ main (int argc, const char *argv[])
             &sys, gsl_odeiv2_step_rk4imp, tol/2, tol, 0.0);
 
     // Initial condition from equation 11 of http://arxiv.org/abs/1006.3888
+    // Having a high-precision initial condition avoids shooting approaches
     double eta = 0.0;
     double f[ndim] = { 0.0, 0.0, 0.33205733621519630 };
     printf("%22s  %22s  %22s  %22s\n", "eta", "f", "fp", "fpp");
