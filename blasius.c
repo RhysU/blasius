@@ -55,7 +55,7 @@ main (int argc, const char *argv[])
     // Do /not/ blindly trust the tolerance as Blasius is notoriously difficult
     const gsl_odeiv2_system sys = {func, jac, ndim, NULL};
     gsl_odeiv2_driver* const d = gsl_odeiv2_driver_alloc_yp_new (
-            &sys, gsl_odeiv2_step_rk4imp, tol*10, tol, 0.0);
+            &sys, gsl_odeiv2_step_rk8pd, tol*10, tol, 0.0);
 
     // Initial condition from equation 11 of http://arxiv.org/abs/1006.3888
     // Having a high-precision initial condition avoids shooting approaches
