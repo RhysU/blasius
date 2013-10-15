@@ -6,6 +6,9 @@
 *.lib
 *.a
 
+# Editor swap files
+*.sw[po]
+
 # Shared objects (inc. Windows DLLs)
 *.dll
 *.so
