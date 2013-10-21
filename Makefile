@@ -1,4 +1,4 @@
-CFLAGS   := -std=c99 -Wall -Wextra -O3
+CFLAGS   ?= -std=c99 -Wall -Wextra -O3
 CPPFLAGS := `gsl-config --cflags`
 LDLIBS   := `gsl-config --libs`
 
