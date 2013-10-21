@@ -1,6 +1,6 @@
 CFLAGS   := -std=c99 -Wall -Wextra -O3
 CPPFLAGS := `gsl-config --cflags`
-LDFLAGS  := `gsl-config --libs`
+LDLIBS   := `gsl-config --libs`
 
 all     : blasius
 blasius : blasius.c
